@@ -99,7 +99,7 @@ fun KotlinType?.toKtVariantType(): ClassName {
         this.getJetTypeFqName(false) == "kotlin.String" -> ClassName("godot.core.KtVariant.Type", "STRING")
         this.isBooleanOrNullableBoolean() -> ClassName("godot.core.KtVariant.Type", "BOOL")
         this.isCoreType() -> ClassName("godot.core.KtVariant.Type", this.getJetTypeFqName(false).substringAfterLast(".").toUpperCase())
-        this.isAnyOrNullableAny() -> ClassName("godot.core.KtVariant.Type", "OBJECT")
+        this.isAnyOrNullableAny() || this.supertypes().any { it.isAnyOrNullableAny() } -> ClassName("godot.core.KtVariant.Type", "OBJECT")
         else -> throw IllegalStateException("ReturnType $this cannot be handled by godot")
     }
 }
@@ -113,7 +113,7 @@ fun KotlinType.toKtVariantConversionFunctionName(): String {
         this.getJetTypeFqName(false) == "kotlin.String" -> "asString"
         this.isBooleanOrNullableBoolean() -> "asBoolean"
         this.isCoreType() -> "as${this.getJetTypeFqName(false).substringAfterLast(".")}"
-        this.isAnyOrNullableAny() -> "asObject"
+        this.isAnyOrNullableAny() || this.supertypes().any { it.isAnyOrNullableAny() } -> "asObject"
         else -> throw IllegalStateException("ReturnType $this cannot be handled by godot")
     }
 }
